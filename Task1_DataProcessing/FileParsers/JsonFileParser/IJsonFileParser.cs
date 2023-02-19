@@ -4,6 +4,6 @@ namespace Task1_DataProcessing.FileParsers.JsonFileParser
 {
     internal interface IJsonFileParser
     {
-        public Task SaveFileAsync(string path, List<Transform> transforms);
+        public Task SaveFileAsync(string fileName, List<Transform> transforms);
     }
 }

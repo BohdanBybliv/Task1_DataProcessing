@@ -1,7 +1,9 @@
-﻿namespace Task1_DataProcessing.FileParsers.CsvFileParser
+﻿using Task1_DataProcessing.Models;
+
+namespace Task1_DataProcessing.FileParsers.CsvFileParser
 {
     internal interface ICsvFileParser
     {
-        public Task ParseFile(string fileName);
+        public Task<FileParserMethodResult> ParseFile(string fileName);
     }
 }
