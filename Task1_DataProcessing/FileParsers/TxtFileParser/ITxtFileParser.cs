@@ -1,7 +1,9 @@
-﻿namespace Task1_DataProcessing.FileParsers.TxtFileParser
+﻿using Task1_DataProcessing.Models;
+
+namespace Task1_DataProcessing.FileParsers.TxtFileParser
 {
     internal interface ITxtFileParser
     {
-        public Task ParseFile(string fileName);
+        public Task<FileParserMethodResult> ParseFile(string fileName);
     }
 }

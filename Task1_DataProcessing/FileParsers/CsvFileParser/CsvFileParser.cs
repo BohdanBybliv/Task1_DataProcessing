@@ -7,20 +7,25 @@ namespace Task1_DataProcessing.FileParsers.CsvFileParser
     internal class CsvFileParser : ICsvFileParser
     {
         private readonly IJsonFileParser _fileParser;
+        private readonly Logger _logger;
         private readonly string? _folder_b;
-        public CsvFileParser()
+        public CsvFileParser(Logger logger)
         {
             _fileParser = new JsonFileParser.JsonFileParser();
+            _logger = logger;
             _folder_b = ConfigurationManager.AppSettings.Get("folder_b");
         }
-        public async Task ParseFile(string fileName)
+        public async Task<FileParserMethodResult> ParseFile(string fileName)
         {
+            int lines;
             List<Transform> transforms = new List<Transform>();
 
             using (StreamReader reader = new StreamReader(fileName))
             {
                 var input = await reader.ReadToEndAsync();
-                var rows = input.Split('\n');
+                var rows = input.Split('\n').ToList();
+                rows.Remove(rows[0]);
+                lines = rows.Count;
 
                 foreach (var row in rows)
                 {
@@ -80,7 +85,11 @@ namespace Task1_DataProcessing.FileParsers.CsvFileParser
                 }
             }
 
-            await _fileParser.SaveFileAsync(_folder_b + "output2.json", transforms);
+            string outputFile = $"output{_logger.ParsedFiles + 1}.json";
+
+            await _fileParser.SaveFileAsync(outputFile, transforms);
+
+            return new FileParserMethodResult(true, $"The file is processed, the result is saved in {outputFile}!", lines);
         }
     }
 }
