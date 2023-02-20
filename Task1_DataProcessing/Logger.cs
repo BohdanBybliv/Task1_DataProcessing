@@ -16,6 +16,7 @@ namespace Task1_DataProcessing
             FoundErrors = 0;
             InvalidFiles = new List<string>();
             _folder_b = ConfigurationManager.AppSettings.Get("folder_b");
+            LoadLog();
         }
         public void SaveLog()
         {
@@ -40,6 +41,41 @@ namespace Task1_DataProcessing
                 }
             }
             ResetLog();
+        }
+        public void LoadLog()
+        {
+            string path = $"{_folder_b}/{DateTime.Now.ToString("dd-MM-yyyy")}/meta.log";
+            
+            if (!File.Exists(path)) return;
+            
+            using (StreamReader reader = new StreamReader(path))
+            {
+                var rows = reader.ReadToEnd().Split('\n');
+
+                if (rows.Length < 4) return;
+
+                try
+                {
+                    ParsedFiles = Convert.ToInt32(rows[0].Split(' ')[1]);
+
+                    ParsedLines = Convert.ToInt32(rows[1].Split(' ')[1]);
+
+                    FoundErrors = Convert.ToInt32(rows[2].Split(' ')[1]);
+
+                    if (FoundErrors != 0)
+                    {
+                        var invalidFiles = rows[3].Replace(",", "").Split(' ');
+                        for (int i = 1; i < invalidFiles.Length; i++)
+                        {
+                            InvalidFiles.Add(invalidFiles[i]);
+                        }
+                    }
+                }
+                catch (Exception)
+                {
+                    ResetLog();
+                }
+            }
         }
         public void ResetLog()
         {

@@ -70,14 +70,19 @@ namespace Task1_DataProcessing
                 Console.WriteLine(result.Message);
                 _logger.ParsedFiles++;
                 _logger.ParsedLines += result.ParsedLines;
+                _logger.FoundErrors += result.FoundErrors;
+                if (result.FoundErrors > 0) _logger.InvalidFiles.Add(e.Name);
             }
             else
             {
                 Console.WriteLine(result.Message);
-                _logger.ParsedFiles++;
-                _logger.ParsedLines += result.ParsedLines;
-                _logger.FoundErrors += result.FoundErrors;
-                _logger.InvalidFiles.Add(e.Name);
+                if (result.FoundErrors > 0)
+                {
+                    _logger.ParsedFiles++;
+                    _logger.ParsedLines += result.ParsedLines;
+                    _logger.FoundErrors += result.FoundErrors;
+                    _logger.InvalidFiles.Add(e.Name);
+                }
             }
         }
     }

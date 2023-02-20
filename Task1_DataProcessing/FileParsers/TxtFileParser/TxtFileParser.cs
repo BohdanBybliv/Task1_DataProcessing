@@ -8,16 +8,17 @@ namespace Task1_DataProcessing.FileParsers.TxtFileParser
     {
         private readonly IJsonFileParser _fileParser;
         private readonly Logger _logger;
-        private readonly string? _folder_b;
         public TxtFileParser(Logger logger)
         {
             _fileParser = new JsonFileParser.JsonFileParser();
             _logger = logger;
-            _folder_b = ConfigurationManager.AppSettings.Get("folder_b");
         }
         public async Task<FileParserMethodResult> ParseFile(string fileName)
         {
-            int lines;
+            if (!File.Exists(fileName)) return new FileParserMethodResult(false, "File doesn't exist", 0);
+
+            int lines = 0;
+            int foundErrors = 0;
             List<Transform> transforms = new List<Transform>();
 
             using (StreamReader reader = new StreamReader(fileName))
@@ -28,41 +29,52 @@ namespace Task1_DataProcessing.FileParsers.TxtFileParser
 
                 foreach (var row in rows)
                 {
-                    var items = row.Replace(",", "").Split('"');
-
-                    string name = items[0].Remove(items[0].Length - 1);
-
-                    string city = items[1].Substring(0, items[1].IndexOf(' '));
-
+                    string name;
+                    string city;
                     decimal payment;
                     DateTime date;
                     long accountNumber;
                     string serviceName;
-
-                    if (items.Length == 3)
+                    try
                     {
-                        var values = items[2].Split(' ');
+                        var items = row.Replace(",", "").Split('"');
 
-                        payment = Convert.ToDecimal(values[1].Replace(".", ","));
+                        name = items[0].Remove(items[0].Length - 1);
 
-                        date = DateTime.ParseExact(values[2], "yyyy-dd-MM", null);
+                        city = items[1].Substring(0, items[1].IndexOf(' '));
 
-                        accountNumber = Convert.ToInt64(values[3]);
+                        if (items.Length == 3)
+                        {
+                            var values = items[2].Split(' ');
 
-                        serviceName = values[4].Replace(" ", "").Replace("\r", "");
+                            payment = Convert.ToDecimal(values[1].Replace(".", ","));
+
+                            date = DateTime.ParseExact(values[2], "yyyy-dd-MM", null);
+
+                            accountNumber = Convert.ToInt64(values[3]);
+
+                            serviceName = values[4].Replace(" ", "").Replace("\r", "");
+                        }
+                        else
+                        {
+                            var values = items[2].Split(' ');
+
+                            payment = Convert.ToDecimal(values[1].Replace(".", ","));
+
+                            date = DateTime.ParseExact(values[2], "yyyy-dd-MM", null);
+
+                            accountNumber = Convert.ToInt64(items[3]);
+
+                            serviceName = items[4].Replace(" ", "").Replace("\r", "");
+                        }
                     }
-                    else
+                    catch (Exception)
                     {
-                        var values = items[2].Split(' ');
-
-                        payment = Convert.ToDecimal(values[1].Replace(".", ","));
-
-                        date = DateTime.ParseExact(values[2], "yyyy-dd-MM", null);
-
-                        accountNumber = Convert.ToInt64(items[3]);
-
-                        serviceName = items[4].Replace(" ", "").Replace("\r", "");
+                        lines--;
+                        foundErrors++;
+                        continue;
                     }
+                    
 
                     var transform = transforms.FirstOrDefault(f => f.City == city);
                     Payer payer = new Payer(name, payment, date, accountNumber);
@@ -106,11 +118,14 @@ namespace Task1_DataProcessing.FileParsers.TxtFileParser
                 }
             }
 
+            if (lines == 0) return new FileParserMethodResult(false, "The file is empty or all lines have errors (missing values or invalid types)", lines, foundErrors);
+            
             string outputFile = $"output{_logger.ParsedFiles + 1}.json";
 
-            await _fileParser.SaveFileAsync(outputFile, transforms);
+            var result = await _fileParser.SaveFileAsync(outputFile, transforms);
 
-            return new FileParserMethodResult(true, $"The file is processed, the result is saved in {outputFile}!", lines);
+            if (result.IsSuccess) return new FileParserMethodResult(true, $"The file is processed, the result is saved in {outputFile}!", lines, foundErrors);
+            else return new FileParserMethodResult(false, $"\nThe file is processed but doesn't saved.\nException: {result.Message}", 0);
         }
     }
 }

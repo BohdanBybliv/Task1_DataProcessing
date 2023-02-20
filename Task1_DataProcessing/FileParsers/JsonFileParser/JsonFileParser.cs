@@ -11,15 +11,24 @@ namespace Task1_DataProcessing.FileParsers.JsonFileParser
         {
             _folder_b = ConfigurationManager.AppSettings.Get("folder_b");
         }
-        public async Task SaveFileAsync(string fileName, List<Transform> transforms)
+        public async Task<SaveMethodResult> SaveFileAsync(string fileName, List<Transform> transforms)
         {
-            string path = $"{_folder_b}/{DateTime.Now.ToString("dd-MM-yyyy")}";
-            Directory.CreateDirectory(path);
-
-            using (FileStream fs = new FileStream($"{path}/{fileName}", FileMode.OpenOrCreate))
+            try
             {
-                await JsonSerializer.SerializeAsync(fs, transforms);
+                string path = $"{_folder_b}/{DateTime.Now.ToString("dd-MM-yyyy")}";
+                Directory.CreateDirectory(path);
+
+                using (FileStream fs = new FileStream($"{path}/{fileName}", FileMode.OpenOrCreate))
+                {
+                    await JsonSerializer.SerializeAsync(fs, transforms);
+                }
             }
+            catch (Exception ex)
+            {
+                return new SaveMethodResult(false, ex.Message);
+            }
+            
+            return new SaveMethodResult(true, string.Empty);
         }
     }
 }
