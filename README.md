@@ -15,3 +15,5 @@
 Commas and quotes are ignored.
 
 When the file is processed, the service saves the results in a separate folder (B) (the path is specified in the config) in a subfolder (C) with the current date (i.g. 09-21-2022). As a file name, is used “output” + today’s current file number + “.json”.
+
+The log is saved to 'meta.log' at the end of the day (midnight) and when the service is shut down.
