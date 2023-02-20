@@ -25,7 +25,7 @@ namespace Task1_DataProcessing
 
             string outputFile = $"{path}/meta.log";
 
-            using (StreamWriter writer = new StreamWriter(outputFile, false))
+            using (StreamWriter writer = new StreamWriter(outputFile))
             {
                 writer.WriteLine($"parsed_files: {ParsedFiles}");
                 writer.WriteLine($"parsed_lines: {ParsedLines}");
@@ -41,6 +41,7 @@ namespace Task1_DataProcessing
                 }
             }
             ResetLog();
+            Console.WriteLine("\nLog is saved!");
         }
         public void LoadLog()
         {
@@ -56,13 +57,14 @@ namespace Task1_DataProcessing
 
                 try
                 {
-                    ParsedFiles = Convert.ToInt32(rows[0].Split(' ')[1]);
+                    ParsedFiles += Convert.ToInt32(rows[0].Split(' ')[1]);
 
-                    ParsedLines = Convert.ToInt32(rows[1].Split(' ')[1]);
+                    ParsedLines += Convert.ToInt32(rows[1].Split(' ')[1]);
 
-                    FoundErrors = Convert.ToInt32(rows[2].Split(' ')[1]);
+                    int foundErrors = Convert.ToInt32(rows[2].Split(' ')[1]);
+                    FoundErrors += foundErrors;
 
-                    if (FoundErrors != 0)
+                    if (foundErrors != 0)
                     {
                         var invalidFiles = rows[3].Replace(",", "").Split(' ');
                         for (int i = 1; i < invalidFiles.Length; i++)

@@ -1,5 +1,4 @@
-﻿using System.Configuration;
-using Task1_DataProcessing.FileParsers.JsonFileParser;
+﻿using Task1_DataProcessing.FileParsers.JsonFileParser;
 using Task1_DataProcessing.Models;
 
 namespace Task1_DataProcessing.FileParsers.CsvFileParser
@@ -15,7 +14,7 @@ namespace Task1_DataProcessing.FileParsers.CsvFileParser
         }
         public async Task<FileParserMethodResult> ParseFile(string fileName)
         {
-            if (!File.Exists(fileName)) return new FileParserMethodResult(false, "File doesn't exist", 0);
+            if (!File.Exists(fileName)) return new FileParserMethodResult(false, "\nFile doesn't exist", 0);
 
             int lines = 0;
             int foundErrors = 0;
@@ -101,13 +100,13 @@ namespace Task1_DataProcessing.FileParsers.CsvFileParser
                 }
             }
 
-            if (lines == 0) return new FileParserMethodResult(false, "The file is empty or all lines have errors (missing values or invalid types)", lines, foundErrors);
+            if (lines == 0) return new FileParserMethodResult(false, "\nThe file is empty or all lines have errors (missing values or invalid types)", lines, foundErrors);
 
             string outputFile = $"output{_logger.ParsedFiles + 1}.json";
 
             var result = await _fileParser.SaveFileAsync(outputFile, transforms);
 
-            if (result.IsSuccess) return new FileParserMethodResult(true, $"The file is processed, the result is saved in {outputFile}!", lines, foundErrors);
+            if (result.IsSuccess) return new FileParserMethodResult(true, $"\nThe file is processed, the result is saved in {outputFile}!", lines, foundErrors);
             else return new FileParserMethodResult(false, $"\nThe file is processed but doesn't saved.\nException: {result.Message}", 0);
         }
     }
