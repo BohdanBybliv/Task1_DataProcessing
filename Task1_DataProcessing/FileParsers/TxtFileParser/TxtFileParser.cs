@@ -69,7 +69,6 @@ namespace Task1_DataProcessing.FileParsers.TxtFileParser
                     }
                     catch (Exception)
                     {
-                        lines--;
                         foundErrors++;
                         continue;
                     }
@@ -117,8 +116,6 @@ namespace Task1_DataProcessing.FileParsers.TxtFileParser
                 }
             }
 
-            if (lines == 0) return new FileParserMethodResult(false, "\nThe file is empty or all lines have errors (missing values or invalid types)", lines, foundErrors);
-            
             string outputFile = $"output{_logger.ParsedFiles + 1}.json";
 
             var result = await _fileParser.SaveFileAsync(outputFile, transforms);

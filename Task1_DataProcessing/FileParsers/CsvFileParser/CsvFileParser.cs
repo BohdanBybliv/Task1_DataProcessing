@@ -53,7 +53,6 @@ namespace Task1_DataProcessing.FileParsers.CsvFileParser
                     }
                     catch (Exception)
                     {
-                        lines--;
                         foundErrors++;
                         continue;
                     }
@@ -99,8 +98,6 @@ namespace Task1_DataProcessing.FileParsers.CsvFileParser
                     }
                 }
             }
-
-            if (lines == 0) return new FileParserMethodResult(false, "\nThe file is empty or all lines have errors (missing values or invalid types)", lines, foundErrors);
 
             string outputFile = $"output{_logger.ParsedFiles + 1}.json";
 
