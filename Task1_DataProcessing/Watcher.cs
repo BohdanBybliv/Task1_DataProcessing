@@ -131,25 +131,11 @@ namespace Task1_DataProcessing
         }
         private void UpdateLog(FileParserMethodResult result, string fileName)
         {
-            if (result.IsSuccess)
-            {
-                Console.WriteLine(result.Message);
-                _logger.ParsedFiles++;
-                _logger.ParsedLines += result.ParsedLines;
-                _logger.FoundErrors += result.FoundErrors;
-                if (result.FoundErrors > 0) _logger.InvalidFiles.Add(fileName);
-            }
-            else
-            {
-                Console.WriteLine(result.Message);
-                if (result.FoundErrors > 0)
-                {
-                    _logger.ParsedFiles++;
-                    _logger.ParsedLines += result.ParsedLines;
-                    _logger.FoundErrors += result.FoundErrors;
-                    _logger.InvalidFiles.Add(fileName);
-                }
-            }
+            Console.WriteLine(result.Message);
+            _logger.ParsedFiles++;
+            _logger.ParsedLines += result.ParsedLines;
+            _logger.FoundErrors += result.FoundErrors;
+            if (result.FoundErrors > 0) _logger.InvalidFiles.Add(fileName);
         }
         private async void OnChanged(object sender, FileSystemEventArgs e)
         {
